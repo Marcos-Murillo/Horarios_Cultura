@@ -186,9 +186,9 @@ export default function GroupDetailPage() {
           ) : (
             <div className="space-y-6">
               {sortedDays.map((day) => (
-                <Card key={day} className="bg-white/95 backdrop-blur-sm">
+                <Card key={day} className="bg-transparent backdrop-blur-sm border-transparent">
                   <CardHeader>
-                    <CardTitle className="flex items-center gap-3">
+                    <CardTitle className="flex items-center gap-3" style={{ color: groupColor }}>
                       <Calendar className="h-5 w-5" style={{ color: groupColor }} />
                       {getDayInSpanish(day)}
                     </CardTitle>
@@ -218,7 +218,7 @@ export default function GroupDetailPage() {
                             <div className="flex items-center gap-2">
                               {schedule.subGroup && (
                                 <Badge variant="outline" className="text-xs">
-                                  {schedule.subGroup}
+                                  {schedule.lugar}
                                 </Badge>
                               )}
                               <Badge
