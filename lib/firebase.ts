@@ -87,10 +87,10 @@ export const CULTURAL_GROUPS: CulturalGroup[] = [
   },
   {
     id: "danza-arabe",
-    name: "GRUPO DE DANZA ÁRABE Y TRIBAL DE LA UNIVERSIDAD DEL VALLE",
-    shortName: "Danza Árabe",
-    logo: "/images/logos/danza-arabe.jpg",
-    background: "/images/backgrounds/danza-arabe.jpg",
+    name: "CORO UNIVERSITARIO SAN FERNANDO",
+    shortName: "CORO SAN FERNANDO",
+    logo: "/images/logos/",
+    background: "/images/backgrounds/",
     color: "#dc2626",
   },
   {
