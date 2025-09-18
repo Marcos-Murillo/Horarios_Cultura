@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { ArrowLeft, Clock, Calendar, Users, MapPin } from "lucide-react"
 import { getSchedulesByGroup, type Schedule, generateGroupColor, CULTURAL_GROUPS } from "@/lib/firebase"
+import { GroupAvatar } from "@/components/group-avatar"
 
 export default function GroupDetailPage() {
   const params = useParams()
@@ -147,11 +148,12 @@ export default function GroupDetailPage() {
 
           <div className="flex items-center gap-4 mb-4">
             {currentGroup?.logo ? (
-              <img
-                src={currentGroup.logo || "/placeholder.svg"}
-                alt={`Logo ${groupName}`}
-                className="w-12 h-12 rounded-full object-cover border-2 border-white/20"
-              />
+              <GroupAvatar
+                            groupName={currentGroup.name}
+                            shortName={currentGroup.shortName}
+                            color={currentGroup.color}
+                            size="lg"
+                          />
             ) : (
               <div className="w-6 h-6 rounded-full flex-shrink-0" style={{ backgroundColor: groupColor }}></div>
             )}

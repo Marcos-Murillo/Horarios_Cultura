@@ -9,6 +9,7 @@ import { Users, Instagram, Globe, Facebook, ArrowRight, MapPin } from "lucide-re
 import { useRouter } from "next/navigation"
 import { getSchedules, getSchedulesByGroup, CULTURAL_GROUPS, type Schedule } from "@/lib/firebase"
 import { cacheManager, debounce } from "@/lib/performance-utils"
+import { GroupAvatar } from "@/components/group-avatar"
 
 export default function HomePage() {
   const router = useRouter()
@@ -225,19 +226,12 @@ export default function HomePage() {
                     <CardContent className="p-3 sm:p-4">
                       <div className="flex items-center justify-between gap-2">
                         <div className="flex items-center gap-2 sm:gap-3 min-w-0 flex-1">
-                          <picture>
-                            <source
-                              srcSet={group.logo?.replace(".png", ".webp") || "/placeholder.svg"}
-                              type="image/webp"
-                            />
-                            <img
-                              src={group.logo || "/placeholder.svg"}
-                              alt={`Logo ${group.shortName}`}
-                              className="w-8 h-8 sm:w-10 sm:h-10 rounded-full object-cover flex-shrink-0"
-                              loading="lazy"
-                              decoding="async"
-                            />
-                          </picture>
+                          <GroupAvatar
+                            groupName={group.name}
+                            shortName={group.shortName}
+                            color={group.color}
+                            size="md"
+                          />
                           <div className="min-w-0 flex-1">
                             <h3
                               className="font-semibold text-xs sm:text-sm text-gray-900 leading-tight line-clamp-2"
@@ -280,16 +274,7 @@ export default function HomePage() {
                 const group = CULTURAL_GROUPS.find((g) => g.name === modalGroup)
                 return group ? (
                   <>
-                    <picture>
-                      <source srcSet={group.logo?.replace(".png", ".webp") || "/placeholder.svg"} type="image/webp" />
-                      <img
-                        src={group.logo || "/placeholder.svg"}
-                        alt={`Logo ${group.shortName}`}
-                        className="w-4 h-4 sm:w-6 sm:h-6 rounded-full object-cover flex-shrink-0"
-                        loading="lazy"
-                        decoding="async"
-                      />
-                    </picture>
+                    <GroupAvatar groupName={group.name} shortName={group.shortName} color={group.color} size="sm" />
                     <span className="truncate">Horarios de {group.shortName}</span>
                   </>
                 ) : (
