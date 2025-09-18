@@ -1,13 +1,14 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { Users, Instagram, Globe, Facebook, ArrowRight, MapPin } from "lucide-react"
-import { CULTURAL_GROUPS, getSchedulesByGroup, type Schedule } from "@/lib/firebase"
 import { useRouter } from "next/navigation"
+import { getSchedules, getSchedulesByGroup, CULTURAL_GROUPS, type Schedule } from "@/lib/firebase"
+import { cacheManager, debounce } from "@/lib/performance-utils"
 
 export default function HomePage() {
   const router = useRouter()
@@ -16,8 +17,34 @@ export default function HomePage() {
   const [loading, setLoading] = useState(false)
   const [showModal, setShowModal] = useState(false)
   const [modalGroup, setModalGroup] = useState<string>("")
+  const [allSchedules, setAllSchedules] = useState<Schedule[]>([])
+  const [initialLoading, setInitialLoading] = useState(true)
 
-  const handleGroupClick = async (groupName: string) => {
+  useEffect(() => {
+    fetchAllSchedules()
+  }, [])
+
+  const fetchAllSchedules = async () => {
+    try {
+      const cachedSchedules = cacheManager.get("schedules_data")
+      if (cachedSchedules) {
+        setAllSchedules(cachedSchedules)
+        setInitialLoading(false)
+        return
+      }
+
+      const schedulesData = await getSchedules()
+      setAllSchedules(schedulesData)
+      cacheManager.set("schedules_data", schedulesData, 300000)
+    } catch (error) {
+      console.error("[v0] Error fetching schedules:", error)
+      setAllSchedules([])
+    } finally {
+      setInitialLoading(false)
+    }
+  }
+
+  const debouncedHandleGroupClick = debounce(async (groupName: string) => {
     setLoading(true)
     setModalGroup(groupName)
     setShowModal(true)
@@ -31,6 +58,10 @@ export default function HomePage() {
     } finally {
       setLoading(false)
     }
+  }, 150)
+
+  const handleGroupClick = (groupName: string) => {
+    debouncedHandleGroupClick(groupName)
   }
 
   const handleViewDetails = (groupName: string) => {
@@ -110,7 +141,6 @@ export default function HomePage() {
 
   return (
     <div className="min-h-screen relative">
-      {/* Background with overlay */}
       <div
         className="fixed inset-0 bg-cover bg-center bg-no-repeat"
         style={{
@@ -167,68 +197,99 @@ export default function HomePage() {
 
         {/* Cultural Groups List */}
         <div className="max-w-4xl mx-auto">
-          <div className="grid gap-2 sm:gap-3 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
-            {CULTURAL_GROUPS.map((group) => {
-              return (
-                <Card
-                  key={group.id}
-                  className="bg-white/95 backdrop-blur-sm hover:bg-white cursor-pointer transition-all duration-300 hover:scale-[1.02] hover:shadow-lg overflow-hidden"
-                  onClick={() => handleGroupClick(group.name)}
-                >
+          {initialLoading ? (
+            <div className="grid gap-2 sm:gap-3 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
+              {Array.from({ length: 8 }).map((_, i) => (
+                <Card key={i} className="bg-white/95 backdrop-blur-sm animate-pulse">
                   <CardContent className="p-3 sm:p-4">
-                    <div className="flex items-center justify-between gap-2">
-                      <div className="flex items-center gap-2 sm:gap-3 min-w-0 flex-1">
-                        <img
-                          src={group.logo || "/placeholder.svg"}
-                          alt={`Logo ${group.shortName}`}
-                          className="w-8 h-8 sm:w-10 sm:h-10 rounded-full object-cover flex-shrink-0"
-                        />
-                        <div className="min-w-0 flex-1">
-                          <h3
-                            className="font-semibold text-xs sm:text-sm text-gray-900 leading-tight line-clamp-2"
-                            title={group.name}
-                          >
-                            {group.shortName}
-                          </h3>
-                          <p className="text-xs text-gray-600 mt-0.5 sm:mt-1">Ver horarios</p>
-                        </div>
-                      </div>
-                      <div className="flex items-center gap-1 flex-shrink-0">
-                        <Users className="h-3 w-3 sm:h-4 sm:w-4 text-gray-400" />
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          className="text-gray-600 hover:text-gray-900 p-1 h-auto"
-                          onClick={(e) => {
-                            e.stopPropagation()
-                            handleViewDetails(group.name)
-                          }}
-                        >
-                          <ArrowRight className="h-3 w-3" />
-                        </Button>
+                    <div className="flex items-center gap-2 sm:gap-3">
+                      <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-gray-300"></div>
+                      <div className="flex-1">
+                        <div className="h-4 bg-gray-300 rounded mb-1"></div>
+                        <div className="h-3 bg-gray-200 rounded w-2/3"></div>
                       </div>
                     </div>
                   </CardContent>
                 </Card>
-              )
-            })}
-          </div>
+              ))}
+            </div>
+          ) : (
+            <div className="grid gap-2 sm:gap-3 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
+              {CULTURAL_GROUPS.map((group) => {
+                return (
+                  <Card
+                    key={group.id}
+                    className="bg-white/95 backdrop-blur-sm hover:bg-white cursor-pointer transition-all duration-300 hover:scale-[1.02] hover:shadow-lg overflow-hidden"
+                    onClick={() => handleGroupClick(group.name)}
+                  >
+                    <CardContent className="p-3 sm:p-4">
+                      <div className="flex items-center justify-between gap-2">
+                        <div className="flex items-center gap-2 sm:gap-3 min-w-0 flex-1">
+                          <picture>
+                            <source
+                              srcSet={group.logo?.replace(".png", ".webp") || "/placeholder.svg"}
+                              type="image/webp"
+                            />
+                            <img
+                              src={group.logo || "/placeholder.svg"}
+                              alt={`Logo ${group.shortName}`}
+                              className="w-8 h-8 sm:w-10 sm:h-10 rounded-full object-cover flex-shrink-0"
+                              loading="lazy"
+                              decoding="async"
+                            />
+                          </picture>
+                          <div className="min-w-0 flex-1">
+                            <h3
+                              className="font-semibold text-xs sm:text-sm text-gray-900 leading-tight line-clamp-2"
+                              title={group.name}
+                            >
+                              {group.shortName}
+                            </h3>
+                            <p className="text-xs text-gray-600 mt-0.5 sm:mt-1">Ver horarios</p>
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-1 flex-shrink-0">
+                          <Users className="h-3 w-3 sm:h-4 sm:w-4 text-gray-400" />
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            className="text-gray-600 hover:text-gray-900 p-1 h-auto"
+                            onClick={(e) => {
+                              e.stopPropagation()
+                              handleViewDetails(group.name)
+                            }}
+                          >
+                            <ArrowRight className="h-3 w-3" />
+                          </Button>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                )
+              })}
+            </div>
+          )}
         </div>
       </div>
 
       <Dialog open={showModal} onOpenChange={setShowModal}>
-        <DialogContent className="max-w-[95vw] sm:max-w-[90vw] md:max-w-4xl max-h-[85vh] sm:max-h-[80vh] overflow-y-auto mx-2">
+        <DialogContent className="max-w-[95vw] sm:max-w-[90vw] md:max-w-4xl max-h-[85vh] sm:max-h-[80vh] overflow-y-auto mx-2 bg-white">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2 text-sm sm:text-base">
               {(() => {
                 const group = CULTURAL_GROUPS.find((g) => g.name === modalGroup)
                 return group ? (
                   <>
-                    <img
-                      src={group.logo || "/placeholder.svg"}
-                      alt={`Logo ${group.shortName}`}
-                      className="w-4 h-4 sm:w-6 sm:h-6 rounded-full object-cover flex-shrink-0"
-                    />
+                    <picture>
+                      <source srcSet={group.logo?.replace(".png", ".webp") || "/placeholder.svg"} type="image/webp" />
+                      <img
+                        src={group.logo || "/placeholder.svg"}
+                        alt={`Logo ${group.shortName}`}
+                        className="w-4 h-4 sm:w-6 sm:h-6 rounded-full object-cover flex-shrink-0"
+                        loading="lazy"
+                        decoding="async"
+                      />
+                    </picture>
                     <span className="truncate">Horarios de {group.shortName}</span>
                   </>
                 ) : (
