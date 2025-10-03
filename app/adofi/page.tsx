@@ -232,7 +232,7 @@ export default function AdminPage() {
                         <SelectTrigger className="text-sm">
                           <SelectValue placeholder="Selecciona un grupo" />
                         </SelectTrigger>
-                        <SelectContent>
+                        <SelectContent className="bg-white">
                           {CULTURAL_GROUPS.map((group) => (
                             <SelectItem key={group.id} value={group.name} className="text-sm">
                               {group.name}
