@@ -290,7 +290,7 @@ export default function AdminPage() {
                         <SelectTrigger className="text-sm">
                           <SelectValue placeholder="Selecciona un día" />
                         </SelectTrigger>
-                        <SelectContent>
+                        <SelectContent className="bg-white">
                           <SelectItem value="Monday">Lunes</SelectItem>
                           <SelectItem value="Tuesday">Martes</SelectItem>
                           <SelectItem value="Wednesday">Miércoles</SelectItem>
@@ -316,7 +316,7 @@ export default function AdminPage() {
                         <SelectTrigger className="text-sm">
                           <SelectValue placeholder="Selecciona el tipo (opcional)" />
                         </SelectTrigger>
-                        <SelectContent>
+                        <SelectContent className="bg-white">
                           <SelectItem value="none">Ninguno</SelectItem>
                           <SelectItem value="semillero">Semillero</SelectItem>
                           <SelectItem value="proceso">Proceso</SelectItem>
