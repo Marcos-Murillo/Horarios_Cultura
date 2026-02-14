@@ -88,9 +88,9 @@ export const CULTURAL_GROUPS: CulturalGroup[] = [
   {
     id: "danza-arabe",
     name: "CORO UNIVERSITARIO SAN FERNANDO",
-    shortName: "CORO SAN FERNANDO",
-    logo: "/images/logos/",
-    background: "/images/backgrounds/",
+    shortName: "Coro San Fernando",
+    logo: "/images/logos/danza-arabe.jpg",
+    background: "/images/backgrounds/danza-arabe.jpg",
     color: "#dc2626",
   },
   {

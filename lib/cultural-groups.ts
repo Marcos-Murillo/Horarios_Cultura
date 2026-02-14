@@ -5,7 +5,7 @@ export const CULTURAL_GROUPS = [
   "GRUPO CAPOEIRA DE LA UNIVERSIDAD DEL VALLE",
   "GRUPO DE ARTE URBANO (RAP, FREESTYLE, DIBUJO, MURALISMO Y GRAFITI DE LA UNIVERSIDAD DEL VALLE)",
   "GRUPO DE BAILES LATINOS DE LA UNIVERSIDAD DEL VALLE",
-  "GRUPO DE DANZA ÁRABE Y TRIBAL DE LA UNIVERSIDAD DEL VALLE",
+  "CORO UNIVERSITARIO SAN FERNANDO",
   "GRUPO DE DANZA CONTEMPORÁNEA DE LA UNIVERSIDAD DEL VALLE",
   "GRUPO DE DANZA ORIENTAL DE LA UNIVERSIDAD DEL VALLE",
   "GRUPO DE DANZA URBANA Y BREACKING DE LA UNIVERSIDAD DEL VALLE",
@@ -51,13 +51,13 @@ export function getGroupColor(groupName: string): string {
 }
 
 export function getShortGroupName(fullName: string): string {
-  if (fullName.includes("CUAP")) return "CUAP"
+  if (fullName.includes("CUAP")) return "Cuap"
   if (fullName.includes("CORO MAGNO")) return "Coro Magno"
   if (fullName.includes("ESTUDIANTINA")) return "Estudiantina"
   if (fullName.includes("CAPOEIRA")) return "Capoeira"
   if (fullName.includes("ARTE URBANO")) return "Arte Urbano"
   if (fullName.includes("BAILES LATINOS")) return "Bailes Latinos"
-  if (fullName.includes("DANZA ÁRABE")) return "Danza Árabe"
+  if (fullName.includes("SAN FERNANDO")) return "Coro San Fernando"
   if (fullName.includes("DANZA CONTEMPORÁNEA")) return "Danza Contemporánea"
   if (fullName.includes("DANZA ORIENTAL")) return "Danza Oriental"
   if (fullName.includes("DANZA URBANA Y BREACKING")) return "Danza Urbana & Breaking"
