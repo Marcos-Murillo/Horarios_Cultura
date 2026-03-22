@@ -3,9 +3,8 @@
 import { useState, useEffect } from "react"
 import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
-import { Users, Instagram, Globe, Facebook, ArrowRight, MapPin } from "lucide-react"
+import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog"
+import { Users, Instagram, Globe, Facebook, ArrowRight, MapPin, Clock, Calendar } from "lucide-react"
 import { useRouter } from "next/navigation"
 import { getSchedules, getSchedulesByGroup, CULTURAL_GROUPS, type Schedule } from "@/lib/firebase"
 import { cacheManager, debounce } from "@/lib/performance-utils"
@@ -86,56 +85,130 @@ export default function HomePage() {
     return days[day] || day
   }
 
-  const WeeklyCalendar = ({ schedules }: { schedules: Schedule[] }) => {
-    const days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
-    const daysInSpanish = ["Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado", "Domingo"]
+  const toRgba = (hex: string, alpha: number) => {
+    const r = parseInt(hex.slice(1, 3), 16)
+    const g = parseInt(hex.slice(3, 5), 16)
+    const b = parseInt(hex.slice(5, 7), 16)
+    return `rgba(${r}, ${g}, ${b}, ${alpha})`
+  }
 
-    const schedulesByDay = schedules.reduce(
-      (acc, schedule) => {
-        if (!acc[schedule.dayOfWeek]) {
-          acc[schedule.dayOfWeek] = []
-        }
-        acc[schedule.dayOfWeek].push(schedule)
-        return acc
-      },
-      {} as { [key: string]: Schedule[] },
-    )
+  const getDayEmoji = (day: string) => {
+    const map: Record<string, string> = {
+      Monday: "🌱", Tuesday: "🎭", Wednesday: "🎨",
+      Thursday: "🎵", Friday: "✨", Saturday: "🎪", Sunday: "🌟",
+    }
+    return map[day] || "📅"
+  }
+
+  const getDuration = (start: string, end: string) => {
+    const s = new Date(`2000-01-01T${start}`)
+    const e = new Date(`2000-01-01T${end}`)
+    const mins = (e.getTime() - s.getTime()) / 60000
+    return mins >= 60 ? `${mins / 60}h` : `${mins}min`
+  }
+
+  const ScheduleTimeline = ({ schedules, groupColor }: { schedules: Schedule[], groupColor: string }) => {
+    const dayOrder = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
+    const days: Record<string, string> = {
+      Monday: "Lunes", Tuesday: "Martes", Wednesday: "Miércoles",
+      Thursday: "Jueves", Friday: "Viernes", Saturday: "Sábado", Sunday: "Domingo",
+    }
+
+    const byDay = schedules.reduce((acc, s) => {
+      if (!acc[s.dayOfWeek]) acc[s.dayOfWeek] = []
+      acc[s.dayOfWeek].push(s)
+      return acc
+    }, {} as Record<string, Schedule[]>)
+
+    const sortedDays = dayOrder.filter((d) => byDay[d])
+
+    if (sortedDays.length === 0) {
+      return (
+        <div className="text-center py-8">
+          <Calendar className="h-10 w-10 mx-auto mb-3 text-white/30" />
+          <p className="text-white/50 text-sm">Sin horarios registrados</p>
+        </div>
+      )
+    }
 
     return (
-      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-7 gap-2 sm:gap-3">
-        {days.map((day, index) => (
-          <div key={day} className="space-y-2">
-            <h3 className="font-semibold text-center p-1.5 sm:p-2 bg-gray-100 rounded-lg text-xs sm:text-sm truncate">
-              {daysInSpanish[index]}
-            </h3>
-            <div className="space-y-1.5 sm:space-y-2 min-h-[120px] sm:min-h-[150px]">
-              {schedulesByDay[day]
-                ?.sort((a, b) => a.startTime.localeCompare(b.startTime))
-                .map((schedule) => (
-                  <div
-                    key={schedule.id}
-                    className="p-1.5 sm:p-2 rounded text-white text-xs"
-                    style={{ backgroundColor: schedule.color }}
-                  >
-                    <p className="opacity-90 text-xs leading-tight">
-                      {formatTime(schedule.startTime)} - {formatTime(schedule.endTime)}
-                    </p>
-                    {schedule.lugar && (
-                      <p className="opacity-75 text-xs truncate flex items-center gap-1 mt-1" title={schedule.lugar}>
-                        <MapPin className="h-2.5 w-2.5 flex-shrink-0" />
-                        <span className="truncate">{schedule.lugar}</span>
-                      </p>
-                    )}
-                    {schedule.subGroup && (
-                      <Badge variant="secondary" className="text-xs mt-1 px-1 py-0 h-auto">
-                        {schedule.subGroup}
-                      </Badge>
-                    )}
-                  </div>
-                ))}
+      <div className="relative">
+        {/* Línea vertical */}
+        <div
+          className="absolute left-[10px] top-2 bottom-2 w-0.5 rounded-full"
+          style={{ background: `linear-gradient(to bottom, ${groupColor}, ${toRgba(groupColor, 0.15)})` }}
+        />
+        <div className="space-y-5 pl-8">
+          {sortedDays.map((day) => (
+            <div key={day} className="relative">
+              {/* Nodo */}
+              <div
+                className="absolute -left-[26px] top-2.5 w-3 h-3 rounded-full border-2 border-white/30"
+                style={{ backgroundColor: groupColor, boxShadow: `0 0 8px ${toRgba(groupColor, 0.7)}` }}
+              />
+              {/* Día */}
+              <div className="flex items-center gap-2 mb-2">
+                <span className="text-base">{getDayEmoji(day)}</span>
+                <span className="text-white font-semibold text-sm">{days[day]}</span>
+                <div className="flex-1 h-px bg-white/10" />
+              </div>
+              {/* Horarios */}
+              <div className="space-y-2">
+                {byDay[day]
+                  .sort((a, b) => a.startTime.localeCompare(b.startTime))
+                  .map((schedule) => (
+                    <div
+                      key={schedule.id}
+                      className="rounded-xl p-3 flex items-center justify-between gap-2 flex-wrap"
+                      style={{
+                        background: "rgba(255,255,255,0.08)",
+                        borderLeft: `3px solid ${groupColor}`,
+                        boxShadow: "0 2px 12px rgba(0,0,0,0.15), inset 0 1px 0 rgba(255,255,255,0.1)",
+                        backdropFilter: "blur(8px)",
+                        border: `1px solid rgba(255,255,255,0.12)`,
+                        borderLeftColor: groupColor,
+                        borderLeftWidth: "3px",
+                      }}
+                    >
+                      <div className="flex items-center gap-2.5">
+                        <div
+                          className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0"
+                          style={{ background: toRgba(groupColor, 0.25), border: `1px solid ${toRgba(groupColor, 0.4)}` }}
+                        >
+                          <Clock className="h-3.5 w-3.5" style={{ color: groupColor }} />
+                        </div>
+                        <div>
+                          <p className="text-white font-bold text-xs">
+                            {schedule.startTime} — {schedule.endTime}
+                          </p>
+                          {schedule.subGroup && (
+                            <p className="text-white/50 text-xs capitalize">{schedule.subGroup}</p>
+                          )}
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-1.5 flex-wrap">
+                        {schedule.lugar && (
+                          <span
+                            className="flex items-center gap-1 rounded-full px-2 py-0.5 text-xs text-white/85"
+                            style={{ background: toRgba(groupColor, 0.2), border: `1px solid ${toRgba(groupColor, 0.35)}` }}
+                          >
+                            <MapPin className="h-2.5 w-2.5" style={{ color: groupColor }} />
+                            {schedule.lugar}
+                          </span>
+                        )}
+                        <span
+                          className="rounded-full px-2 py-0.5 text-xs font-bold text-white"
+                          style={{ background: toRgba(groupColor, 0.35), border: `1px solid ${toRgba(groupColor, 0.5)}` }}
+                        >
+                          {getDuration(schedule.startTime, schedule.endTime)}
+                        </span>
+                      </div>
+                    </div>
+                  ))}
+              </div>
             </div>
-          </div>
-        ))}
+          ))}
+        </div>
       </div>
     )
   }
@@ -168,7 +241,7 @@ export default function HomePage() {
               variant="outline"
               size="icon"
               className="bg-white/10 border-white/20 hover:bg-white/20 h-9 w-9 sm:h-10 sm:w-10"
-              onClick={() => window.open("https://www.instagram.com/areaculturaunivalle/", "_blank")}
+              onClick={() => window.open("https://www.instagram.com/culturarecreadeporteunivalle/", "_blank")}
             >
               <Instagram className="h-4 w-4 sm:h-5 sm:w-5 text-white" />
             </Button>
@@ -201,7 +274,7 @@ export default function HomePage() {
           {initialLoading ? (
             <div className="grid gap-2 sm:gap-3 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
               {Array.from({ length: 8 }).map((_, i) => (
-                <Card key={i} className="bg-white/95 backdrop-blur-sm animate-pulse">
+                <Card key={i} className="bg-white/10 backdrop-blur-md border border-white/20 animate-pulse">
                   <CardContent className="p-3 sm:p-4">
                     <div className="flex items-center gap-2 sm:gap-3">
                       <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-gray-300"></div>
@@ -220,7 +293,7 @@ export default function HomePage() {
                 return (
                   <Card
                     key={group.id}
-                    className="bg-white/95 backdrop-blur-sm hover:bg-white cursor-pointer transition-all duration-300 hover:scale-[1.02] hover:shadow-lg overflow-hidden"
+                    className="bg-white/10 backdrop-blur-md border border-white/20 hover:bg-white/20 cursor-pointer transition-all duration-300 hover:scale-[1.02] hover:shadow-xl shadow-black/20 overflow-hidden"
                     onClick={() => handleGroupClick(group.name)}
                   >
                     <CardContent className="p-3 sm:p-4">
@@ -234,20 +307,20 @@ export default function HomePage() {
                           />
                           <div className="min-w-0 flex-1">
                             <h3
-                              className="font-semibold text-xs sm:text-sm text-gray-900 leading-tight line-clamp-2"
+                              className="font-semibold text-xs sm:text-sm text-white leading-tight line-clamp-2"
                               title={group.name}
                             >
                               {group.shortName}
                             </h3>
-                            <p className="text-xs text-gray-600 mt-0.5 sm:mt-1">Ver horarios</p>
+                            <p className="text-xs text-white/60 mt-0.5 sm:mt-1">Ver horarios</p>
                           </div>
                         </div>
                         <div className="flex items-center gap-1 flex-shrink-0">
-                          <Users className="h-3 w-3 sm:h-4 sm:w-4 text-gray-400" />
+                          <Users className="h-3 w-3 sm:h-4 sm:w-4 text-white/40" />
                           <Button
                             variant="ghost"
                             size="sm"
-                            className="text-gray-600 hover:text-gray-900 p-1 h-auto"
+                            className="text-white/60 hover:text-white p-1 h-auto"
                             onClick={(e) => {
                               e.stopPropagation()
                               handleViewDetails(group.name)
@@ -267,39 +340,62 @@ export default function HomePage() {
       </div>
 
       <Dialog open={showModal} onOpenChange={setShowModal}>
-        <DialogContent className="max-w-[95vw] sm:max-w-[90vw] md:max-w-4xl max-h-[85vh] sm:max-h-[80vh] overflow-y-auto mx-2 bg-white">
-          <DialogHeader>
-            <DialogTitle className="flex items-center gap-2 text-sm sm:text-base">
-              {(() => {
-                const group = CULTURAL_GROUPS.find((g) => g.name === modalGroup)
-                return group ? (
-                  <>
+        <DialogContent
+          className="max-w-[92vw] sm:max-w-lg border-0 p-0 rounded-2xl overflow-hidden left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2"
+          style={{
+            background: "rgba(15, 15, 25, 0.75)",
+            backdropFilter: "blur(20px)",
+            boxShadow: "0 25px 60px rgba(0,0,0,0.5)",
+            margin: 0,
+          }}
+        >
+          {(() => {
+            const group = CULTURAL_GROUPS.find((g) => g.name === modalGroup)
+            const groupColor = group?.color || "#E8A020"
+            return (
+              <>
+                {/* Header con color del grupo */}
+                <div
+                  className="px-5 py-4 flex items-center gap-3"
+                  style={{
+                    background: `linear-gradient(135deg, ${toRgba(groupColor, 0.4)} 0%, rgba(255,255,255,0.05) 100%)`,
+                    borderBottom: `1px solid ${toRgba(groupColor, 0.3)}`,
+                  }}
+                >
+                  {group && (
                     <GroupAvatar groupName={group.name} shortName={group.shortName} color={group.color} size="sm" />
-                    <span className="truncate">Horarios de {group.shortName}</span>
-                  </>
-                ) : (
-                  <span className="truncate">Horarios de {modalGroup}</span>
-                )
-              })()}
-            </DialogTitle>
-          </DialogHeader>
-          <div className="mt-3 sm:mt-4">
-            {loading ? (
-              <p className="text-center text-gray-600 py-6 sm:py-8 text-sm sm:text-base">Cargando horarios...</p>
-            ) : groupSchedules.length > 0 ? (
-              <WeeklyCalendar schedules={groupSchedules} />
-            ) : (
-              <p className="text-center text-gray-600 py-6 sm:py-8 text-sm sm:text-base">
-                No hay horarios registrados para este grupo
-              </p>
-            )}
-          </div>
-          <div className="flex justify-end mt-3 sm:mt-4">
-            <Button variant="outline" onClick={() => handleViewDetails(modalGroup)} className="text-sm">
-              Ver detalles completos
-              <ArrowRight className="h-3 w-3 sm:h-4 sm:w-4 ml-2" />
-            </Button>
-          </div>
+                  )}
+                  <div className="flex-1 min-w-0">
+                    <DialogTitle className="text-white font-bold text-sm sm:text-base truncate">
+                      {group?.shortName || modalGroup}
+                    </DialogTitle>
+                    <p className="text-white/50 text-xs mt-0.5">Horarios semanales</p>
+                  </div>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="text-white/60 hover:text-white hover:bg-white/10 shrink-0"
+                    onClick={() => handleViewDetails(modalGroup)}
+                  >
+                    <ArrowRight className="h-4 w-4" />
+                    <span className="ml-1 text-xs hidden sm:inline">Ver más</span>
+                  </Button>
+                </div>
+
+                {/* Contenido con scroll */}
+                <div className="p-5 max-h-[70vh] overflow-y-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
+                  {loading ? (
+                    <div className="text-center py-8">
+                      <div className="w-8 h-8 rounded-full border-2 border-white/20 border-t-white animate-spin mx-auto mb-3" />
+                      <p className="text-white/50 text-sm">Cargando horarios...</p>
+                    </div>
+                  ) : (
+                    <ScheduleTimeline schedules={groupSchedules} groupColor={groupColor} />
+                  )}
+                </div>
+              </>
+            )
+          })()}
         </DialogContent>
       </Dialog>
     </div>

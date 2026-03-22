@@ -31,9 +31,23 @@ export function GroupAvatar({ groupName, shortName, color, size = "md", classNam
 
   const initials = getInitials(shortName)
 
+  // Genera un color secundario ligeramente más claro para el gradiente
+  const toRgba = (hex: string, alpha: number) => {
+    const r = parseInt(hex.slice(1, 3), 16)
+    const g = parseInt(hex.slice(3, 5), 16)
+    const b = parseInt(hex.slice(5, 7), 16)
+    return `rgba(${r}, ${g}, ${b}, ${alpha})`
+  }
+
+  const gradientStyle = {
+    background: `linear-gradient(135deg, ${color} 0%, ${toRgba(color, 0.6)} 100%)`,
+    boxShadow: `0 4px 14px ${toRgba(color, 0.5)}, inset 0 1px 0 rgba(255,255,255,0.2)`,
+    border: `1px solid ${toRgba(color, 0.4)}`,
+  }
+
   return (
     <Avatar className={`${sizeClasses[size]} ${className}`}>
-      <AvatarFallback className="font-bold text-white border-2 border-white/20" style={{ backgroundColor: color }}>
+      <AvatarFallback className="font-bold text-white" style={gradientStyle}>
         {initials}
       </AvatarFallback>
     </Avatar>

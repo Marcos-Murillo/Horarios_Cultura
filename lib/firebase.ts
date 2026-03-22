@@ -43,7 +43,7 @@ export const CULTURAL_GROUPS: CulturalGroup[] = [
     shortName: "CUAP",
     logo: "/images/logos/cuap.jpg",
     background: "/images/backgrounds/cuap.jpg",
-    color: "#059669",
+    color: "#E8A020", // Amarillo bandera colombiana — comunicación popular
   },
   {
     id: "coro",
@@ -51,7 +51,7 @@ export const CULTURAL_GROUPS: CulturalGroup[] = [
     shortName: "Coro Magno",
     logo: "/images/logos/coro.jpg",
     background: "/images/backgrounds/coro.jpg",
-    color: "#a16207",
+    color: "#1A6BAD", // Azul bandera colombiana — solemnidad coral
   },
   {
     id: "estudiantina",
@@ -59,7 +59,7 @@ export const CULTURAL_GROUPS: CulturalGroup[] = [
     shortName: "Estudiantina",
     logo: "/images/logos/estudiantina.jpg",
     background: "/images/backgrounds/estudiantina.jpg",
-    color: "#be123c",
+    color: "#C0392B", // Rojo bandera colombiana — música tradicional
   },
   {
     id: "capoeira",
@@ -67,7 +67,7 @@ export const CULTURAL_GROUPS: CulturalGroup[] = [
     shortName: "Capoeira",
     logo: "/images/logos/capoeira.jpg",
     background: "/images/backgrounds/capoeira.jpg",
-    color: "#ec4899",
+    color: "#27AE60", // Verde selva colombiana — movimiento y naturaleza
   },
   {
     id: "arte-urbano",
@@ -75,7 +75,7 @@ export const CULTURAL_GROUPS: CulturalGroup[] = [
     shortName: "Arte Urbano",
     logo: "/images/logos/arte-urbano.jpg",
     background: "/images/backgrounds/arte-urbano.jpg",
-    color: "#475569",
+    color: "#8E44AD", // Morado — arte urbano y expresión libre
   },
   {
     id: "bailes-latinos",
@@ -83,7 +83,7 @@ export const CULTURAL_GROUPS: CulturalGroup[] = [
     shortName: "Bailes Latinos",
     logo: "/images/logos/bailes-latinos.jpg",
     background: "/images/backgrounds/bailes-latinos.jpg",
-    color: "#7c3aed",
+    color: "#E74C3C", // Rojo salsa — pasión y ritmo latino
   },
   {
     id: "danza-arabe",
@@ -91,7 +91,7 @@ export const CULTURAL_GROUPS: CulturalGroup[] = [
     shortName: "Coro San Fernando",
     logo: "/images/logos/danza-arabe.jpg",
     background: "/images/backgrounds/danza-arabe.jpg",
-    color: "#dc2626",
+    color: "#2980B9", // Azul cielo — voces y armonía
   },
   {
     id: "danza-contemporanea",
@@ -99,7 +99,7 @@ export const CULTURAL_GROUPS: CulturalGroup[] = [
     shortName: "Danza Contemporánea",
     logo: "/images/logos/danza-contemporanea.jpg",
     background: "/images/backgrounds/danza-contemporanea.jpg",
-    color: "#ea580c",
+    color: "#D35400", // Naranja tierra — expresión corporal
   },
   {
     id: "danza-oriental",
@@ -107,7 +107,7 @@ export const CULTURAL_GROUPS: CulturalGroup[] = [
     shortName: "Danza Oriental",
     logo: "/images/logos/danza-oriental.jpg",
     background: "/images/backgrounds/danza-oriental.jpg",
-    color: "#0891b2",
+    color: "#16A085", // Verde esmeralda — misticismo oriental
   },
   {
     id: "danza-urbana",
@@ -115,7 +115,7 @@ export const CULTURAL_GROUPS: CulturalGroup[] = [
     shortName: "Danza Urbana",
     logo: "/images/logos/danza-urbana.jpg",
     background: "/images/backgrounds/danza-urbana.jpg",
-    color: "#16a34a",
+    color: "#F39C12", // Amarillo cálido — energía urbana
   },
   {
     id: "laboratorio-artistico",
@@ -123,7 +123,7 @@ export const CULTURAL_GROUPS: CulturalGroup[] = [
     shortName: "Laboratorio Artístico",
     logo: "/images/logos/laboratorio-artistico.jpg",
     background: "/images/backgrounds/laboratorio-artistico.jpg",
-    color: "#059669",
+    color: "#1ABC9C", // Turquesa — creatividad y experimentación
   },
   {
     id: "carmen-lopez",
@@ -131,7 +131,7 @@ export const CULTURAL_GROUPS: CulturalGroup[] = [
     shortName: "Carmen López",
     logo: "/images/logos/carmen-lopez.jpg",
     background: "/images/backgrounds/carmen-lopez.jpg",
-    color: "#a16207",
+    color: "#C0392B", // Rojo folclor — música y danza tradicional
   },
   {
     id: "narracion-oral",
@@ -139,7 +139,7 @@ export const CULTURAL_GROUPS: CulturalGroup[] = [
     shortName: "El Perol",
     logo: "/images/logos/narracion-oral.jpg",
     background: "/images/backgrounds/narracion-oral.jpg",
-    color: "#be123c",
+    color: "#E67E22", // Naranja cálido — cuentería y tradición oral
   },
   {
     id: "poesia",
@@ -147,7 +147,7 @@ export const CULTURAL_GROUPS: CulturalGroup[] = [
     shortName: "Poesía",
     logo: "/images/logos/poesia.jpg",
     background: "/images/backgrounds/poesia.jpg",
-    color: "#ec4899",
+    color: "#9B59B6", // Violeta — poesía y lirismo
   },
   {
     id: "teatro",
@@ -155,7 +155,7 @@ export const CULTURAL_GROUPS: CulturalGroup[] = [
     shortName: "Teatro",
     logo: "/images/logos/teatro.jpg",
     background: "/images/backgrounds/teatro.jpg",
-    color: "#475569",
+    color: "#2C3E8C", // Azul índigo — teatro y drama
   },
   {
     id: "orquesta-salsa",
@@ -163,7 +163,7 @@ export const CULTURAL_GROUPS: CulturalGroup[] = [
     shortName: "Orquesta Salsa",
     logo: "/images/logos/orquesta-salsa.jpg",
     background: "/images/backgrounds/orquesta-salsa.jpg",
-    color: "#7c3aed",
+    color: "#E8A020", // Amarillo dorado — brillo de la orquesta
   },
   {
     id: "seleccion-salsa",
@@ -171,7 +171,7 @@ export const CULTURAL_GROUPS: CulturalGroup[] = [
     shortName: "Selección Salsa",
     logo: "/images/logos/seleccion-salsa.jpg",
     background: "/images/backgrounds/seleccion-salsa.jpg",
-    color: "#dc2626",
+    color: "#E74C3C", // Rojo pasión — salsa y bachata
   },
   {
     id: "univalluno-cancion",
@@ -179,7 +179,7 @@ export const CULTURAL_GROUPS: CulturalGroup[] = [
     shortName: "Univalluno de Canción",
     logo: "/images/logos/univalluno-cancion.jpg",
     background: "/images/backgrounds/univalluno-cancion.jpg",
-    color: "#ea580c",
+    color: "#27AE60", // Verde esperanza — canción universitaria
   },
   {
     id: "voces-libres",
@@ -187,7 +187,7 @@ export const CULTURAL_GROUPS: CulturalGroup[] = [
     shortName: "Voces Libres",
     logo: "/images/logos/voces-libres.jpg",
     background: "/images/backgrounds/voces-libres.jpg",
-    color: "#0891b2",
+    color: "#2980B9", // Azul libertad — expresión vocal
   },
   {
     id: "baile-recreativo",
@@ -195,7 +195,7 @@ export const CULTURAL_GROUPS: CulturalGroup[] = [
     shortName: "Baile Recreativo",
     logo: "/images/logos/baile-recreativo.jpg",
     background: "/images/backgrounds/baile-recreativo.jpg",
-    color: "#16a34a",
+    color: "#F39C12", // Amarillo alegre — recreación y disfrute
   },
 ]
 

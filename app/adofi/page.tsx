@@ -9,8 +9,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Badge } from "@/components/ui/badge"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Calendar, Plus, Edit, Trash2, Save, X, Home, MapPin, Filter } from "lucide-react"
+import { Calendar, Plus, Edit, Trash2, Save, X, Home, MapPin, Filter, LayoutList } from "lucide-react"
 import {
   CULTURAL_GROUPS,
   getSchedules,
@@ -21,6 +20,7 @@ import {
   type Schedule,
 } from "@/lib/firebase"
 import { useRouter } from "next/navigation"
+import { FloatingNav } from "@/components/ui/floating-navbar"
 
 export default function AdminPage() {
   const router = useRouter()
@@ -28,7 +28,7 @@ export default function AdminPage() {
   const [loading, setLoading] = useState(true)
   const [editingSchedule, setEditingSchedule] = useState<Schedule | null>(null)
 
-  // Form state
+  const [activeTab, setActiveTab] = useState<"form" | "calendar">("form")
   const [formData, setFormData] = useState({
     groupName: "",
     startTime: "",
@@ -194,18 +194,29 @@ export default function AdminPage() {
           </Button>
         </div>
 
-        <Tabs defaultValue="form" className="space-y-4 sm:space-y-6">
-          <TabsList className="grid w-full grid-cols-2">
-            <TabsTrigger value="form" className="text-xs sm:text-sm">
-              Gestionar Horarios
-            </TabsTrigger>
-            <TabsTrigger value="calendar" className="text-xs sm:text-sm">
-              Vista de Calendario
-            </TabsTrigger>
-          </TabsList>
+        <FloatingNav
+          navItems={[
+            {
+              name: "Gestionar Horarios",
+              link: "#",
+              icon: <LayoutList className="h-4 w-4" />,
+              onClick: () => setActiveTab("form"),
+              active: activeTab === "form",
+            },
+            {
+              name: "Vista de Calendario",
+              link: "#",
+              icon: <Calendar className="h-4 w-4" />,
+              onClick: () => setActiveTab("calendar"),
+              active: activeTab === "calendar",
+            },
+          ]}
+          className="cursor-pointer"
+        />
 
-          {/* Form Tab */}
-          <TabsContent value="form" className="space-y-4 sm:space-y-6">
+        <div className="space-y-4 sm:space-y-6 pt-20">
+          {activeTab === "form" && (
+            <div className="space-y-4 sm:space-y-6">
             <div className="grid grid-cols-1 xl:grid-cols-2 gap-4 sm:gap-6">
               {/* Form */}
               <Card>
@@ -429,10 +440,10 @@ export default function AdminPage() {
                 </CardContent>
               </Card>
             </div>
-          </TabsContent>
+          </div>
+          )}
 
-          {/* Calendar Tab */}
-          <TabsContent value="calendar">
+          {activeTab === "calendar" && (
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2 text-base sm:text-lg">
@@ -444,19 +455,19 @@ export default function AdminPage() {
                 {loading ? (
                   <p className="text-center text-gray-600 text-sm">Cargando calendario...</p>
                 ) : (
-                  <WeeklyCalendar schedules={schedules} onEdit={handleEdit} onDelete={handleDelete} />
+                  <WeeklyCalendar schedules={schedules} onEdit={handleEdit} onDelete={handleDelete} onSwitchToForm={() => setActiveTab("form")} />
                 )}
               </CardContent>
             </Card>
-          </TabsContent>
-        </Tabs>
+          )}
+        </div>
       </div>
     </div>
   )
 }
 
 // Weekly Calendar Component
-function WeeklyCalendar({ schedules, onEdit, onDelete }: { schedules: Schedule[], onEdit: (schedule: Schedule) => void, onDelete: (id: string) => void }) {
+function WeeklyCalendar({ schedules, onEdit, onDelete, onSwitchToForm }: { schedules: Schedule[], onEdit: (schedule: Schedule) => void, onDelete: (id: string) => void, onSwitchToForm: () => void }) {
   const [selectedSchedule, setSelectedSchedule] = useState<Schedule | null>(null)
   const [showFilters, setShowFilters] = useState(false)
   const [filters, setFilters] = useState({
@@ -797,28 +808,28 @@ function WeeklyCalendar({ schedules, onEdit, onDelete }: { schedules: Schedule[]
           onClick={() => setSelectedSchedule(null)}
         >
           <div
-            className="bg-white rounded-lg shadow-xl max-w-md w-full p-6"
+            className="bg-white rounded-lg shadow-xl max-w-md w-full overflow-hidden"
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="flex items-start justify-between mb-4">
+            {/* Header con color del grupo */}
+            <div
+              className="px-6 py-4 flex items-start justify-between"
+              style={{ backgroundColor: selectedSchedule.color }}
+            >
               <div className="flex items-center gap-3">
-                <div
-                  className="w-4 h-4 rounded flex-shrink-0"
-                  style={{ backgroundColor: selectedSchedule.color }}
-                ></div>
-                <h3 className="font-semibold text-lg text-gray-900">
+                <h3 className="font-semibold text-lg text-white drop-shadow">
                   {getShortGroupName(selectedSchedule.groupName)}
                 </h3>
               </div>
               <button
                 onClick={() => setSelectedSchedule(null)}
-                className="text-gray-400 hover:text-gray-600"
+                className="text-white/80 hover:text-white transition-colors"
               >
                 <X className="h-5 w-5" />
               </button>
             </div>
 
-            <div className="space-y-3 mb-6">
+            <div className="p-6 space-y-3">
               <div>
                 <p className="text-sm text-gray-500">Grupo</p>
                 <p className="text-sm font-medium text-gray-900">{selectedSchedule.groupName}</p>
@@ -850,31 +861,30 @@ function WeeklyCalendar({ schedules, onEdit, onDelete }: { schedules: Schedule[]
                   </Badge>
                 </div>
               )}
-            </div>
 
-            <div className="flex gap-2">
-              <Button
-                onClick={() => {
-                  onEdit(selectedSchedule)
-                  setSelectedSchedule(null)
-                }}
-                className="flex-1"
-                variant="outline"
-              >
-                <Edit className="h-4 w-4 mr-2" />
-                Editar
-              </Button>
-              <Button
-                onClick={() => {
-                  onDelete(selectedSchedule.id!)
-                  setSelectedSchedule(null)
-                }}
-                className="flex-1"
-                variant="destructive"
-              >
-                <Trash2 className="h-4 w-4 mr-2" />
-                Eliminar
-              </Button>
+              <div className="flex gap-2 pt-3">
+                <Button
+                  onClick={() => {
+                    onEdit(selectedSchedule)
+                    setSelectedSchedule(null)
+                    onSwitchToForm()
+                  }}
+                  className="flex-1 bg-blue-600 hover:bg-blue-700 text-white"
+                >
+                  <Edit className="h-4 w-4 mr-2" />
+                  Editar
+                </Button>
+                <Button
+                  onClick={() => {
+                    onDelete(selectedSchedule.id!)
+                    setSelectedSchedule(null)
+                  }}
+                  className="flex-1 bg-red-600 hover:bg-red-700 text-white"
+                >
+                  <Trash2 className="h-4 w-4 mr-2" />
+                  Eliminar
+                </Button>
+              </div>
             </div>
           </div>
         </div>
