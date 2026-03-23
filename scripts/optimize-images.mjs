@@ -8,8 +8,8 @@ const DIRS = [
 ]
 
 const CONFIG = {
-  backgrounds: { width: 1280, quality: 75 },
-  logos: { width: 200, quality: 80 },
+  backgrounds: { width: 1920, quality: 85 },
+  logos: { width: 200, quality: 82 },
 }
 
 async function optimizeDir(dir) {

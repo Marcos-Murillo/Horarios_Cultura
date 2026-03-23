@@ -21,6 +21,7 @@ import {
 } from "@/lib/firebase"
 import { useRouter } from "next/navigation"
 import { FloatingNav } from "@/components/ui/floating-navbar"
+import { RouteGuard } from "@/components/route-guard"
 
 export default function AdminPage() {
   const router = useRouter()
@@ -178,6 +179,7 @@ export default function AdminPage() {
   )
 
   return (
+    <RouteGuard>
     <div className="min-h-screen bg-gray-50">
       <div className="container mx-auto px-3 sm:px-4 py-6 sm:py-8">
         {/* Header */}
@@ -463,6 +465,7 @@ export default function AdminPage() {
         </div>
       </div>
     </div>
+    </RouteGuard>
   )
 }
 
