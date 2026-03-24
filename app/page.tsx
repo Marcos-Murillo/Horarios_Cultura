@@ -4,7 +4,7 @@ import { useState, useEffect } from "react"
 import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog"
-import { Users, Instagram, Globe, Facebook, ArrowRight, MapPin, Clock, Calendar } from "lucide-react"
+import { Users, Instagram, Globe, Facebook, ArrowRight, MapPin, Clock, Calendar, Search } from "lucide-react"
 import { useRouter } from "next/navigation"
 import { getSchedules, getSchedulesByGroup, CULTURAL_GROUPS, type Schedule } from "@/lib/firebase"
 import { cacheManager, debounce } from "@/lib/performance-utils"
@@ -19,6 +19,7 @@ export default function HomePage() {
   const [modalGroup, setModalGroup] = useState<string>("")
   const [allSchedules, setAllSchedules] = useState<Schedule[]>([])
   const [initialLoading, setInitialLoading] = useState(true)
+  const [search, setSearch] = useState("")
 
   useEffect(() => {
     fetchAllSchedules()
@@ -236,7 +237,7 @@ export default function HomePage() {
           </p>
 
           {/* Social Media Icons */}
-          <div className="flex justify-center gap-3 sm:gap-4 mb-6 sm:mb-8">
+          <div className="flex justify-center gap-3 sm:gap-4 mb-5">
             <Button
               variant="outline"
               size="icon"
@@ -267,6 +268,36 @@ export default function HomePage() {
               <Facebook className="h-4 w-4 sm:h-5 sm:w-5 text-white" />
             </Button>
           </div>
+
+          {/* Buscador */}
+          <div className="max-w-md mx-auto mb-6 sm:mb-8">
+            <div
+              className="flex items-center gap-3 px-4 py-3 rounded-2xl"
+              style={{
+                background: "rgba(255,255,255,0.1)",
+                backdropFilter: "blur(12px)",
+                border: "1px solid rgba(255,255,255,0.2)",
+                boxShadow: "0 4px 24px rgba(0,0,0,0.2), inset 0 1px 0 rgba(255,255,255,0.15)",
+              }}
+            >
+              <Search className="h-4 w-4 text-white/50 flex-shrink-0" />
+              <input
+                type="text"
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                placeholder="Buscar grupo cultural..."
+                className="flex-1 bg-transparent text-white text-sm placeholder:text-white/40 outline-none"
+              />
+              {search && (
+                <button
+                  onClick={() => setSearch("")}
+                  className="text-white/40 hover:text-white/80 text-xs transition-colors"
+                >
+                  ✕
+                </button>
+              )}
+            </div>
+          </div>
         </div>
 
         {/* Cultural Groups List */}
@@ -289,7 +320,10 @@ export default function HomePage() {
             </div>
           ) : (
             <div className="grid gap-2 sm:gap-3 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
-              {CULTURAL_GROUPS.map((group) => {
+              {CULTURAL_GROUPS.filter((group) =>
+                group.shortName.toLowerCase().includes(search.toLowerCase()) ||
+                group.name.toLowerCase().includes(search.toLowerCase())
+              ).map((group) => {
                 return (
                   <Card
                     key={group.id}
