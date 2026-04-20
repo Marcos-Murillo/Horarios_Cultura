@@ -332,6 +332,7 @@ export default function GroupDetailPage() {
             >
               <AnimatedTestimonials
                 autoplay
+                accentColor={groupColor}
                 testimonials={teamMembers.map((m) => ({
                   name: m.name,
                   designation: m.role,

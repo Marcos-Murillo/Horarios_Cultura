@@ -14,9 +14,11 @@ type Testimonial = {
 export const AnimatedTestimonials = ({
   testimonials,
   autoplay = false,
+  accentColor = "#ffffff",
 }: {
   testimonials: Testimonial[];
   autoplay?: boolean;
+  accentColor?: string;
 }) => {
   const [active, setActive] = useState(0);
 
@@ -95,48 +97,27 @@ export const AnimatedTestimonials = ({
         <div className="flex flex-col justify-between py-4">
           <motion.div
             key={active}
-            initial={{
-              y: 20,
-              opacity: 0,
-            }}
-            animate={{
-              y: 0,
-              opacity: 1,
-            }}
-            exit={{
-              y: -20,
-              opacity: 0,
-            }}
-            transition={{
-              duration: 0.2,
-              ease: "easeInOut",
-            }}
+            initial={{ y: 20, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            exit={{ y: -20, opacity: 0 }}
+            transition={{ duration: 0.2, ease: "easeInOut" }}
           >
-            <h3 className="text-2xl font-bold text-black dark:text-white">
+            <h3 className="text-2xl font-bold" style={{ color: accentColor }}>
               {testimonials[active].name}
             </h3>
-            <p className="text-sm text-gray-500 dark:text-neutral-500">
+            <span
+              className="inline-block mt-1 rounded-full px-3 py-0.5 text-xs font-semibold text-white"
+              style={{ backgroundColor: accentColor + "55", border: `1px solid ${accentColor}99` }}
+            >
               {testimonials[active].designation}
-            </p>
-            <motion.p className="mt-8 text-lg text-gray-500 dark:text-neutral-300">
+            </span>
+            <motion.p className="mt-6 text-sm text-white/80 line-clamp-4 leading-relaxed">
               {testimonials[active].quote.split(" ").map((word, index) => (
                 <motion.span
                   key={index}
-                  initial={{
-                    filter: "blur(10px)",
-                    opacity: 0,
-                    y: 5,
-                  }}
-                  animate={{
-                    filter: "blur(0px)",
-                    opacity: 1,
-                    y: 0,
-                  }}
-                  transition={{
-                    duration: 0.2,
-                    ease: "easeInOut",
-                    delay: 0.02 * index,
-                  }}
+                  initial={{ filter: "blur(10px)", opacity: 0, y: 5 }}
+                  animate={{ filter: "blur(0px)", opacity: 1, y: 0 }}
+                  transition={{ duration: 0.2, ease: "easeInOut", delay: 0.02 * index }}
                   className="inline-block"
                 >
                   {word}&nbsp;
@@ -147,15 +128,15 @@ export const AnimatedTestimonials = ({
           <div className="flex gap-4 pt-12 md:pt-0">
             <button
               onClick={handlePrev}
-              className="group/button flex h-7 w-7 items-center justify-center rounded-full bg-gray-100 dark:bg-neutral-800"
+              className="group/button flex h-7 w-7 items-center justify-center rounded-full bg-white/10 border border-white/20"
             >
-              <IconArrowLeft className="h-5 w-5 text-black transition-transform duration-300 group-hover/button:rotate-12 dark:text-neutral-400" />
+              <IconArrowLeft className="h-5 w-5 text-white transition-transform duration-300 group-hover/button:rotate-12" />
             </button>
             <button
               onClick={handleNext}
-              className="group/button flex h-7 w-7 items-center justify-center rounded-full bg-gray-100 dark:bg-neutral-800"
+              className="group/button flex h-7 w-7 items-center justify-center rounded-full bg-white/10 border border-white/20"
             >
-              <IconArrowRight className="h-5 w-5 text-black transition-transform duration-300 group-hover/button:-rotate-12 dark:text-neutral-400" />
+              <IconArrowRight className="h-5 w-5 text-white transition-transform duration-300 group-hover/button:-rotate-12" />
             </button>
           </div>
         </div>
