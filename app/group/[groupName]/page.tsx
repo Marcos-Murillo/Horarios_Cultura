@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button"
 import { ArrowLeft, Clock, Calendar, Users, MapPin, Mail, Instagram } from "lucide-react"
 import { getSchedulesByGroup, getTeamMembersByGroup, type Schedule, type TeamMember, generateGroupColor, CULTURAL_GROUPS } from "@/lib/firebase"
 import { GroupAvatar } from "@/components/group-avatar"
+import { AnimatedTestimonials } from "@/components/ui/animated-testimonials"
 
 export default function GroupDetailPage() {
   const params = useParams()
@@ -325,50 +326,19 @@ export default function GroupDetailPage() {
               <p className="text-white/50 text-sm">Este grupo aún no tiene equipo registrado.</p>
             </div>
           ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              {teamMembers.map((member) => (
-                <div
-                  key={member.id}
-                  className="rounded-2xl backdrop-blur-md border border-white/15 overflow-hidden"
-                  style={{
-                    background: `linear-gradient(135deg, ${toRgba(groupColor, 0.2)} 0%, rgba(255,255,255,0.06) 100%)`,
-                    boxShadow: `0 4px 20px rgba(0,0,0,0.15), inset 0 1px 0 rgba(255,255,255,0.1)`,
-                  }}
-                >
-                  <div className="p-5 flex items-start gap-4">
-                    {member.imageUrl ? (
-                      <img
-                        src={member.imageUrl}
-                        alt={member.name}
-                        className="w-16 h-16 rounded-xl object-cover flex-shrink-0 border border-white/20"
-                      />
-                    ) : (
-                      <div
-                        className="w-16 h-16 rounded-xl flex items-center justify-center flex-shrink-0 text-xl font-bold text-white border border-white/20"
-                        style={{ background: toRgba(groupColor, 0.4) }}
-                      >
-                        {member.name.charAt(0)}
-                      </div>
-                    )}
-                    <div className="flex-1 min-w-0">
-                      <p className="text-white font-bold text-sm leading-tight mb-1">{member.name}</p>
-                      <span
-                        className="inline-block rounded-full px-2.5 py-0.5 text-xs font-medium mb-2"
-                        style={{
-                          background: toRgba(groupColor, 0.35),
-                          color: "white",
-                          border: `1px solid ${toRgba(groupColor, 0.5)}`,
-                        }}
-                      >
-                        {member.role}
-                      </span>
-                      {member.description && (
-                        <p className="text-white/60 text-xs leading-relaxed">{member.description}</p>
-                      )}
-                    </div>
-                  </div>
-                </div>
-              ))}
+            <div
+              className="rounded-2xl backdrop-blur-md border border-white/15 overflow-hidden"
+              style={{ background: "rgba(255,255,255,0.08)" }}
+            >
+              <AnimatedTestimonials
+                autoplay
+                testimonials={teamMembers.map((m) => ({
+                  name: m.name,
+                  designation: m.role,
+                  quote: m.description || "",
+                  src: m.imageUrl || `https://ui-avatars.com/api/?name=${encodeURIComponent(m.name)}&background=${groupColor.slice(1)}&color=fff&size=400`,
+                }))}
+              />
             </div>
           )}
         </div>
