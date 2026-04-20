@@ -45,40 +45,26 @@ export const AnimatedTestimonials = ({
     return Math.floor(Math.random() * 21) - 10;
   };
   return (
-    <div className="mx-auto max-w-sm px-4 py-20 font-sans antialiased md:max-w-4xl md:px-8 lg:px-12">
-      <div className="relative grid grid-cols-1 gap-20 md:grid-cols-2">
+    <div className="mx-auto max-w-sm px-4 py-10 font-sans antialiased md:max-w-4xl md:px-8 lg:px-12">
+      <div className="relative grid grid-cols-1 gap-10 md:grid-cols-2">
+        {/* Columna izquierda: imagen + flechas */}
         <div>
           <div className="relative h-80 w-full">
             <AnimatePresence>
               {testimonials.map((testimonial, index) => (
                 <motion.div
                   key={testimonial.src}
-                  initial={{
-                    opacity: 0,
-                    scale: 0.9,
-                    z: -100,
-                    rotate: randomRotateY(),
-                  }}
+                  initial={{ opacity: 0, scale: 0.9, z: -100, rotate: randomRotateY() }}
                   animate={{
                     opacity: isActive(index) ? 1 : 0.7,
                     scale: isActive(index) ? 1 : 0.95,
                     z: isActive(index) ? 0 : -100,
                     rotate: isActive(index) ? 0 : randomRotateY(),
-                    zIndex: isActive(index)
-                      ? 40
-                      : testimonials.length + 2 - index,
+                    zIndex: isActive(index) ? 40 : testimonials.length + 2 - index,
                     y: isActive(index) ? [0, -80, 0] : 0,
                   }}
-                  exit={{
-                    opacity: 0,
-                    scale: 0.9,
-                    z: 100,
-                    rotate: randomRotateY(),
-                  }}
-                  transition={{
-                    duration: 0.4,
-                    ease: "easeInOut",
-                  }}
+                  exit={{ opacity: 0, scale: 0.9, z: 100, rotate: randomRotateY() }}
+                  transition={{ duration: 0.4, ease: "easeInOut" }}
                   className="absolute inset-0 origin-bottom"
                 >
                   <img
@@ -93,25 +79,43 @@ export const AnimatedTestimonials = ({
               ))}
             </AnimatePresence>
           </div>
+          {/* Flechas debajo de la imagen */}
+          <div className="flex gap-3 mt-4">
+            <button
+              onClick={handlePrev}
+              className="group/button flex h-8 w-8 items-center justify-center rounded-full bg-white/10 border border-white/20 hover:bg-white/20 transition-colors"
+            >
+              <IconArrowLeft className="h-5 w-5 text-white transition-transform duration-300 group-hover/button:rotate-12" />
+            </button>
+            <button
+              onClick={handleNext}
+              className="group/button flex h-8 w-8 items-center justify-center rounded-full bg-white/10 border border-white/20 hover:bg-white/20 transition-colors"
+            >
+              <IconArrowRight className="h-5 w-5 text-white transition-transform duration-300 group-hover/button:-rotate-12" />
+            </button>
+          </div>
         </div>
-        <div className="flex flex-col justify-between py-4">
+
+        {/* Columna derecha: todo el texto */}
+        <div className="flex flex-col gap-3 py-2">
           <motion.div
             key={active}
             initial={{ y: 20, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
             exit={{ y: -20, opacity: 0 }}
             transition={{ duration: 0.2, ease: "easeInOut" }}
+            className="flex flex-col gap-3"
           >
-            <h3 className="text-2xl font-bold" style={{ color: accentColor }}>
+            <h3 className="text-2xl font-bold leading-tight" style={{ color: accentColor }}>
               {testimonials[active].name}
             </h3>
             <span
-              className="inline-block mt-1 rounded-full px-3 py-0.5 text-xs font-semibold text-white"
+              className="self-start rounded-full px-3 py-0.5 text-xs font-semibold text-white"
               style={{ backgroundColor: accentColor + "55", border: `1px solid ${accentColor}99` }}
             >
               {testimonials[active].designation}
             </span>
-            <motion.p className="mt-6 text-sm text-white/80 line-clamp-4 leading-relaxed">
+            <motion.p className="text-sm text-white/80 leading-relaxed line-clamp-[10]">
               {testimonials[active].quote.split(" ").map((word, index) => (
                 <motion.span
                   key={index}
@@ -125,20 +129,6 @@ export const AnimatedTestimonials = ({
               ))}
             </motion.p>
           </motion.div>
-          <div className="flex gap-4 pt-12 md:pt-0">
-            <button
-              onClick={handlePrev}
-              className="group/button flex h-7 w-7 items-center justify-center rounded-full bg-white/10 border border-white/20"
-            >
-              <IconArrowLeft className="h-5 w-5 text-white transition-transform duration-300 group-hover/button:rotate-12" />
-            </button>
-            <button
-              onClick={handleNext}
-              className="group/button flex h-7 w-7 items-center justify-center rounded-full bg-white/10 border border-white/20"
-            >
-              <IconArrowRight className="h-5 w-5 text-white transition-transform duration-300 group-hover/button:-rotate-12" />
-            </button>
-          </div>
         </div>
       </div>
     </div>
