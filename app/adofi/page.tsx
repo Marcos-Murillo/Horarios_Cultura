@@ -9,7 +9,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Badge } from "@/components/ui/badge"
-import { Calendar, Plus, Edit, Trash2, Save, X, Home, MapPin, Filter, LayoutList } from "lucide-react"
+import { Calendar, Plus, Edit, Trash2, Save, X, Home, MapPin, Filter, LayoutList, Users } from "lucide-react"
 import {
   CULTURAL_GROUPS,
   getSchedules,
@@ -22,6 +22,7 @@ import {
 import { useRouter } from "next/navigation"
 import { FloatingNav } from "@/components/ui/floating-navbar"
 import { RouteGuard } from "@/components/route-guard"
+import { TeamAdmin } from "@/components/team-admin"
 
 export default function AdminPage() {
   const router = useRouter()
@@ -29,7 +30,7 @@ export default function AdminPage() {
   const [loading, setLoading] = useState(true)
   const [editingSchedule, setEditingSchedule] = useState<Schedule | null>(null)
 
-  const [activeTab, setActiveTab] = useState<"form" | "calendar">("form")
+  const [activeTab, setActiveTab] = useState<"form" | "calendar" | "equipo">("form")
   const [formData, setFormData] = useState({
     groupName: "",
     startTime: "",
@@ -211,6 +212,13 @@ export default function AdminPage() {
               icon: <Calendar className="h-4 w-4" />,
               onClick: () => setActiveTab("calendar"),
               active: activeTab === "calendar",
+            },
+            {
+              name: "Equipo",
+              link: "#",
+              icon: <Users className="h-4 w-4" />,
+              onClick: () => setActiveTab("equipo"),
+              active: activeTab === "equipo",
             },
           ]}
           className="cursor-pointer"
@@ -461,6 +469,10 @@ export default function AdminPage() {
                 )}
               </CardContent>
             </Card>
+          )}
+
+          {activeTab === "equipo" && (
+            <TeamAdmin />
           )}
         </div>
       </div>

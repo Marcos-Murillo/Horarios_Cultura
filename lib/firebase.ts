@@ -1,5 +1,5 @@
 import { initializeApp } from "firebase/app"
-import { getFirestore, collection, addDoc, getDocs, doc, updateDoc, deleteDoc, query, where } from "firebase/firestore"
+import { getFirestore, collection, addDoc, getDocs, doc, updateDoc, deleteDoc, query, where, orderBy } from "firebase/firestore"
 
 const firebaseConfig = {
   apiKey: "AIzaSyAbxNkjj45FMeHmlRVWGE15jq5SUnngT0c",
@@ -269,4 +269,40 @@ export const deleteSchedule = async (id: string) => {
     console.error("Error deleting schedule:", error)
     throw error
   }
+}
+
+// ── TEAM MEMBERS ──────────────────────────────────────────────────────────────
+
+export interface TeamMember {
+  id?: string
+  groupName: string
+  name: string
+  role: string // "monitor" | "director" | custom
+  description: string
+  imageUrl: string
+  order?: number
+}
+
+export const addTeamMember = async (member: Omit<TeamMember, "id">) => {
+  const docRef = await addDoc(collection(db, "teamMembers"), member)
+  return docRef.id
+}
+
+export const getTeamMembersByGroup = async (groupName: string): Promise<TeamMember[]> => {
+  const q = query(collection(db, "teamMembers"), where("groupName", "==", groupName))
+  const snap = await getDocs(q)
+  return snap.docs.map((d) => ({ id: d.id, ...d.data() } as TeamMember))
+}
+
+export const getAllTeamMembers = async (): Promise<TeamMember[]> => {
+  const snap = await getDocs(collection(db, "teamMembers"))
+  return snap.docs.map((d) => ({ id: d.id, ...d.data() } as TeamMember))
+}
+
+export const updateTeamMember = async (id: string, data: Partial<TeamMember>) => {
+  await updateDoc(doc(db, "teamMembers", id), data)
+}
+
+export const deleteTeamMember = async (id: string) => {
+  await deleteDoc(doc(db, "teamMembers", id))
 }

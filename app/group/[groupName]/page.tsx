@@ -2,10 +2,9 @@
 
 import { useState, useEffect } from "react"
 import { useParams, useRouter } from "next/navigation"
-import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { ArrowLeft, Clock, Calendar, Users, MapPin, Mail, Instagram } from "lucide-react"
-import { getSchedulesByGroup, type Schedule, generateGroupColor, CULTURAL_GROUPS } from "@/lib/firebase"
+import { getSchedulesByGroup, getTeamMembersByGroup, type Schedule, type TeamMember, generateGroupColor, CULTURAL_GROUPS } from "@/lib/firebase"
 import { GroupAvatar } from "@/components/group-avatar"
 
 export default function GroupDetailPage() {
@@ -14,8 +13,10 @@ export default function GroupDetailPage() {
   const groupName = decodeURIComponent(params.groupName as string)
 
   const [schedules, setSchedules] = useState<Schedule[]>([])
+  const [teamMembers, setTeamMembers] = useState<TeamMember[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const [activeTab, setActiveTab] = useState<"horarios" | "equipo">("horarios")
 
   const currentGroup = CULTURAL_GROUPS.find((g) => g.name === groupName)
   const backgroundImage = currentGroup?.background || "/ascun.jpg"
@@ -25,8 +26,12 @@ export default function GroupDetailPage() {
     const fetchSchedules = async () => {
       try {
         setLoading(true)
-        const data = await getSchedulesByGroup(groupName)
+        const [data, team] = await Promise.all([
+          getSchedulesByGroup(groupName),
+          getTeamMembersByGroup(groupName),
+        ])
         setSchedules(data)
+        setTeamMembers(team)
       } catch (err) {
         console.error("Error fetching schedules:", err)
         setError("Error al cargar los horarios")
@@ -164,13 +169,44 @@ export default function GroupDetailPage() {
                     <Calendar className="h-3 w-3" style={{ color: groupColor }} />
                     {schedules.length} horario{schedules.length !== 1 ? "s" : ""}
                   </span>
+                  {teamMembers.length > 0 && (
+                    <span className="flex items-center gap-1.5 bg-white/15 border border-white/20 rounded-full px-3 py-1 text-white/90 text-xs">
+                      <Users className="h-3 w-3" style={{ color: groupColor }} />
+                      {teamMembers.length} integrante{teamMembers.length !== 1 ? "s" : ""}
+                    </span>
+                  )}
                 </div>
               </div>
             </div>
           </div>
         </div>
 
+        {/* ── TABS ── */}
+        <div className="px-4 max-w-3xl mx-auto mb-6">
+          <div
+            className="flex rounded-xl p-1 backdrop-blur-md border border-white/20"
+            style={{ background: "rgba(255,255,255,0.08)" }}
+          >
+            {(["horarios", "equipo"] as const).map((tab) => (
+              <button
+                key={tab}
+                onClick={() => setActiveTab(tab)}
+                className="flex-1 flex items-center justify-center gap-2 py-2 px-4 rounded-lg text-sm font-medium transition-all"
+                style={
+                  activeTab === tab
+                    ? { background: groupColor, color: "white", boxShadow: `0 2px 8px rgba(0,0,0,0.2)` }
+                    : { color: "rgba(255,255,255,0.6)" }
+                }
+              >
+                {tab === "horarios" ? <Calendar className="h-4 w-4" /> : <Users className="h-4 w-4" />}
+                {tab === "horarios" ? "Horarios" : "Equipo"}
+              </button>
+            ))}
+          </div>
+        </div>
+
         {/* ── TIMELINE DE HORARIOS ── */}
+        {activeTab === "horarios" && (
         <div className="px-4 pb-8 max-w-3xl mx-auto">
           {schedules.length === 0 ? (
             <div
@@ -274,6 +310,69 @@ export default function GroupDetailPage() {
             </div>
           )}
         </div>
+        )}
+
+        {/* ── EQUIPO ── */}
+        {activeTab === "equipo" && (
+        <div className="px-4 pb-8 max-w-3xl mx-auto">
+          {teamMembers.length === 0 ? (
+            <div
+              className="rounded-2xl p-10 text-center backdrop-blur-md border border-white/20"
+              style={{ background: "rgba(255,255,255,0.08)" }}
+            >
+              <Users className="h-12 w-12 mx-auto mb-4 opacity-40 text-white" />
+              <h3 className="text-white font-semibold text-lg mb-1">Sin integrantes registrados</h3>
+              <p className="text-white/50 text-sm">Este grupo aún no tiene equipo registrado.</p>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              {teamMembers.map((member) => (
+                <div
+                  key={member.id}
+                  className="rounded-2xl backdrop-blur-md border border-white/15 overflow-hidden"
+                  style={{
+                    background: `linear-gradient(135deg, ${toRgba(groupColor, 0.2)} 0%, rgba(255,255,255,0.06) 100%)`,
+                    boxShadow: `0 4px 20px rgba(0,0,0,0.15), inset 0 1px 0 rgba(255,255,255,0.1)`,
+                  }}
+                >
+                  <div className="p-5 flex items-start gap-4">
+                    {member.imageUrl ? (
+                      <img
+                        src={member.imageUrl}
+                        alt={member.name}
+                        className="w-16 h-16 rounded-xl object-cover flex-shrink-0 border border-white/20"
+                      />
+                    ) : (
+                      <div
+                        className="w-16 h-16 rounded-xl flex items-center justify-center flex-shrink-0 text-xl font-bold text-white border border-white/20"
+                        style={{ background: toRgba(groupColor, 0.4) }}
+                      >
+                        {member.name.charAt(0)}
+                      </div>
+                    )}
+                    <div className="flex-1 min-w-0">
+                      <p className="text-white font-bold text-sm leading-tight mb-1">{member.name}</p>
+                      <span
+                        className="inline-block rounded-full px-2.5 py-0.5 text-xs font-medium mb-2"
+                        style={{
+                          background: toRgba(groupColor, 0.35),
+                          color: "white",
+                          border: `1px solid ${toRgba(groupColor, 0.5)}`,
+                        }}
+                      >
+                        {member.role}
+                      </span>
+                      {member.description && (
+                        <p className="text-white/60 text-xs leading-relaxed">{member.description}</p>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+        )}
 
         {/* ── CONTACTO ── */}
         <div className="px-4 pb-12 max-w-3xl mx-auto">
