@@ -306,3 +306,29 @@ export const updateTeamMember = async (id: string, data: Partial<TeamMember>) =>
 export const deleteTeamMember = async (id: string) => {
   await deleteDoc(doc(db, "teamMembers", id))
 }
+
+// ── GROUP DESCRIPTIONS ────────────────────────────────────────────────────────
+
+export interface GroupDescription {
+  id?: string
+  groupName: string
+  description: string
+}
+
+export const getGroupDescription = async (groupName: string): Promise<GroupDescription | null> => {
+  const q = query(collection(db, "groupDescriptions"), where("groupName", "==", groupName))
+  const snap = await getDocs(q)
+  if (snap.empty) return null
+  const d = snap.docs[0]
+  return { id: d.id, ...d.data() } as GroupDescription
+}
+
+export const saveGroupDescription = async (groupName: string, description: string): Promise<void> => {
+  const q = query(collection(db, "groupDescriptions"), where("groupName", "==", groupName))
+  const snap = await getDocs(q)
+  if (snap.empty) {
+    await addDoc(collection(db, "groupDescriptions"), { groupName, description })
+  } else {
+    await updateDoc(doc(db, "groupDescriptions", snap.docs[0].id), { description })
+  }
+}

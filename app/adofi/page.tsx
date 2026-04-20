@@ -214,7 +214,7 @@ export default function AdminPage() {
               active: activeTab === "calendar",
             },
             {
-              name: "Equipo",
+              name: "Nosotros",
               link: "#",
               icon: <Users className="h-4 w-4" />,
               onClick: () => setActiveTab("equipo"),

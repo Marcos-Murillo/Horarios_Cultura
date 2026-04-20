@@ -4,7 +4,7 @@ import { useState, useEffect } from "react"
 import { useParams, useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { ArrowLeft, Clock, Calendar, Users, MapPin, Mail, Instagram } from "lucide-react"
-import { getSchedulesByGroup, getTeamMembersByGroup, type Schedule, type TeamMember, generateGroupColor, CULTURAL_GROUPS } from "@/lib/firebase"
+import { getSchedulesByGroup, getTeamMembersByGroup, getGroupDescription, type Schedule, type TeamMember, type GroupDescription, generateGroupColor, CULTURAL_GROUPS } from "@/lib/firebase"
 import { GroupAvatar } from "@/components/group-avatar"
 import { AnimatedTestimonials } from "@/components/ui/animated-testimonials"
 
@@ -15,6 +15,7 @@ export default function GroupDetailPage() {
 
   const [schedules, setSchedules] = useState<Schedule[]>([])
   const [teamMembers, setTeamMembers] = useState<TeamMember[]>([])
+  const [groupDesc, setGroupDesc] = useState<GroupDescription | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [activeTab, setActiveTab] = useState<"horarios" | "equipo">("horarios")
@@ -27,12 +28,14 @@ export default function GroupDetailPage() {
     const fetchSchedules = async () => {
       try {
         setLoading(true)
-        const [data, team] = await Promise.all([
+        const [data, team, desc] = await Promise.all([
           getSchedulesByGroup(groupName),
           getTeamMembersByGroup(groupName),
+          getGroupDescription(groupName),
         ])
         setSchedules(data)
         setTeamMembers(team)
+        setGroupDesc(desc)
       } catch (err) {
         console.error("Error fetching schedules:", err)
         setError("Error al cargar los horarios")
@@ -200,7 +203,7 @@ export default function GroupDetailPage() {
                 }
               >
                 {tab === "horarios" ? <Calendar className="h-4 w-4" /> : <Users className="h-4 w-4" />}
-                {tab === "horarios" ? "Horarios" : "Equipo"}
+                {tab === "horarios" ? "Horarios" : "Nosotros"}
               </button>
             ))}
           </div>
@@ -313,9 +316,20 @@ export default function GroupDetailPage() {
         </div>
         )}
 
-        {/* ── EQUIPO ── */}
+        {/* ── NOSOTROS ── */}
         {activeTab === "equipo" && (
         <div className="px-4 pb-8 max-w-3xl mx-auto">
+          {/* Descripción del grupo */}
+          {groupDesc?.description && (
+            <div
+              className="rounded-2xl p-6 backdrop-blur-md border border-white/15 mb-6"
+              style={{ background: `linear-gradient(135deg, ${toRgba(groupColor, 0.15)} 0%, rgba(255,255,255,0.06) 100%)` }}
+            >
+              <p className="text-white/60 text-xs uppercase tracking-widest mb-2 font-medium">Sobre nosotros</p>
+              <p className="text-white/85 text-sm leading-relaxed">{groupDesc.description}</p>
+            </div>
+          )}
+
           {teamMembers.length === 0 ? (
             <div
               className="rounded-2xl p-10 text-center backdrop-blur-md border border-white/20"
