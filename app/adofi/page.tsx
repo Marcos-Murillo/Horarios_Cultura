@@ -23,6 +23,7 @@ import { useRouter } from "next/navigation"
 import { FloatingNav } from "@/components/ui/floating-navbar"
 import { RouteGuard } from "@/components/route-guard"
 import { TeamAdmin } from "@/components/team-admin"
+import { ScheduleForm } from "@/components/schedule-form"
 
 export default function AdminPage() {
   const router = useRouter()
@@ -226,158 +227,11 @@ export default function AdminPage() {
 
         <div className="space-y-4 sm:space-y-6 pt-20">
           {activeTab === "form" && (
-            <div className="space-y-4 sm:space-y-6">
             <div className="grid grid-cols-1 xl:grid-cols-2 gap-4 sm:gap-6">
-              {/* Form */}
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2 text-base sm:text-lg">
-                    {editingSchedule ? (
-                      <Edit className="h-4 w-4 sm:h-5 sm:w-5" />
-                    ) : (
-                      <Plus className="h-4 w-4 sm:h-5 sm:w-5" />
-                    )}
-                    {editingSchedule ? "Editar Horario" : "Agregar Nuevo Horario"}
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <form onSubmit={handleSubmit} className="space-y-3 sm:space-y-4">
-                    <div>
-                      <Label htmlFor="groupName" className="text-sm">
-                        Grupo Cultural
-                      </Label>
-                      <Select
-                        value={formData.groupName}
-                        onValueChange={(value) => setFormData({ ...formData, groupName: value })}
-                      >
-                        <SelectTrigger className="text-sm">
-                          <SelectValue placeholder="Selecciona un grupo" />
-                        </SelectTrigger>
-                        <SelectContent className="bg-white">
-                          {CULTURAL_GROUPS.map((group) => (
-                            <SelectItem key={group.id} value={group.name} className="text-sm">
-                              {group.name}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                      {formErrors.groupName && (
-                        <p className="text-xs sm:text-sm text-red-600 mt-1">{formErrors.groupName}</p>
-                      )}
-                    </div>
+              {/* Nuevo formulario multi-horario */}
+              <ScheduleForm onSaved={fetchSchedules} />
 
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
-                      <div>
-                        <Label htmlFor="startTime" className="text-sm">
-                          Hora de Inicio
-                        </Label>
-                        <Input
-                          id="startTime"
-                          type="time"
-                          value={formData.startTime}
-                          onChange={(e) => setFormData({ ...formData, startTime: e.target.value })}
-                          className="text-sm"
-                        />
-                        {formErrors.startTime && (
-                          <p className="text-xs sm:text-sm text-red-600 mt-1">{formErrors.startTime}</p>
-                        )}
-                      </div>
-
-                      <div>
-                        <Label htmlFor="endTime" className="text-sm">
-                          Hora de Fin
-                        </Label>
-                        <Input
-                          id="endTime"
-                          type="time"
-                          value={formData.endTime}
-                          onChange={(e) => setFormData({ ...formData, endTime: e.target.value })}
-                          className="text-sm"
-                        />
-                        {formErrors.endTime && (
-                          <p className="text-xs sm:text-sm text-red-600 mt-1">{formErrors.endTime}</p>
-                        )}
-                      </div>
-                    </div>
-
-                    <div>
-                      <Label htmlFor="dayOfWeek" className="text-sm">
-                        Día de la Semana
-                      </Label>
-                      <Select
-                        value={formData.dayOfWeek}
-                        onValueChange={(value) => setFormData({ ...formData, dayOfWeek: value })}
-                      >
-                        <SelectTrigger className="text-sm">
-                          <SelectValue placeholder="Selecciona un día" />
-                        </SelectTrigger>
-                        <SelectContent className="bg-white">
-                          <SelectItem value="Monday">Lunes</SelectItem>
-                          <SelectItem value="Tuesday">Martes</SelectItem>
-                          <SelectItem value="Wednesday">Miércoles</SelectItem>
-                          <SelectItem value="Thursday">Jueves</SelectItem>
-                          <SelectItem value="Friday">Viernes</SelectItem>
-                          <SelectItem value="Saturday">Sábado</SelectItem>
-                          <SelectItem value="Sunday">Domingo</SelectItem>
-                        </SelectContent>
-                      </Select>
-                      {formErrors.dayOfWeek && (
-                        <p className="text-xs sm:text-sm text-red-600 mt-1">{formErrors.dayOfWeek}</p>
-                      )}
-                    </div>
-
-                    <div>
-                      <Label htmlFor="subGroup" className="text-sm">
-                        Tipo de Grupo (Opcional)
-                      </Label>
-                      <Select
-                        value={formData.subGroup}
-                        onValueChange={(value) => setFormData({ ...formData, subGroup: value })}
-                      >
-                        <SelectTrigger className="text-sm">
-                          <SelectValue placeholder="Selecciona el tipo (opcional)" />
-                        </SelectTrigger>
-                        <SelectContent className="bg-white">
-                          <SelectItem value="none">Ninguno</SelectItem>
-                          <SelectItem value="semillero">Semillero</SelectItem>
-                          <SelectItem value="proceso">Proceso</SelectItem>
-                          <SelectItem value="representativo">Representativo</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-
-                    <div>
-                      <Label htmlFor="lugar" className="text-sm">
-                        Lugar
-                      </Label>
-                      <Input
-                        id="lugar"
-                        type="text"
-                        placeholder="Ej: Aula 101, Auditorio, Patio central..."
-                        value={formData.lugar}
-                        onChange={(e) => setFormData({ ...formData, lugar: e.target.value })}
-                        className="text-sm"
-                      />
-                      {formErrors.lugar && <p className="text-xs sm:text-sm text-red-600 mt-1">{formErrors.lugar}</p>}
-                    </div>
-
-                    <div className="flex flex-col sm:flex-row gap-2">
-                      <Button type="submit" className="flex-1 text-sm">
-                        <Save className="h-4 w-4 mr-2" />
-                        {editingSchedule ? "Actualizar" : "Guardar"}
-                      </Button>
-                      {editingSchedule && (
-                        <Button type="button" variant="outline" onClick={cancelEdit} className="text-sm bg-transparent">
-                          <X className="h-4 w-4 mr-2" />
-                          Cancelar
-                        </Button>
-                      )}
-                    </div>
-                  </form>
-                </CardContent>
-              </Card>
-
-              {/* Schedules List */}
+              {/* Lista de horarios registrados */}
               <Card>
                 <CardHeader>
                   <CardTitle className="text-base sm:text-lg">Horarios Registrados</CardTitle>
@@ -388,56 +242,33 @@ export default function AdminPage() {
                   ) : schedules.length === 0 ? (
                     <p className="text-center text-gray-600 text-sm">No hay horarios registrados</p>
                   ) : (
-                    <div className="space-y-3 sm:space-y-4 max-h-80 sm:max-h-96 overflow-y-auto">
+                    <div className="space-y-3 sm:space-y-4 max-h-[600px] overflow-y-auto">
                       {Object.entries(schedulesByGroup).map(([groupName, groupSchedules]) => (
                         <div key={groupName} className="space-y-2">
                           <div className="flex items-center gap-2">
-                            <div
-                              className="w-3 h-3 rounded-full flex-shrink-0"
-                              style={{ backgroundColor: generateGroupColor(groupName) }}
-                            ></div>
-                            <h4 className="font-medium text-sm text-gray-900 truncate" title={groupName}>
-                              {groupName}
-                            </h4>
+                            <div className="w-3 h-3 rounded-full flex-shrink-0" style={{ backgroundColor: generateGroupColor(groupName) }} />
+                            <h4 className="font-medium text-sm text-gray-900 truncate" title={groupName}>{groupName}</h4>
                           </div>
                           {groupSchedules.map((schedule) => (
-                            <div
-                              key={schedule.id}
-                              className="ml-5 p-2 sm:p-3 bg-gray-50 rounded-lg flex items-start sm:items-center justify-between gap-2"
-                            >
+                            <div key={schedule.id} className="ml-5 p-2 sm:p-3 bg-gray-50 rounded-lg flex items-start sm:items-center justify-between gap-2">
                               <div className="flex-1 min-w-0">
-                                <p className="text-sm font-medium text-gray-900">
-                                  {getDayInSpanish(schedule.dayOfWeek)}
-                                </p>
+                                <p className="text-sm font-medium text-gray-900">{getDayInSpanish(schedule.dayOfWeek)}</p>
                                 <p className="text-xs text-gray-600 leading-relaxed">
                                   {formatTime(schedule.startTime)} - {formatTime(schedule.endTime)}
                                   {schedule.subGroup && ` • ${schedule.subGroup}`}
                                 </p>
                                 {schedule.lugar && (
-                                  <p
-                                    className="text-xs text-gray-600 flex items-center gap-1 mt-1"
-                                    title={schedule.lugar}
-                                  >
+                                  <p className="text-xs text-gray-600 flex items-center gap-1 mt-1" title={schedule.lugar}>
                                     <MapPin className="h-3 w-3 flex-shrink-0" />
                                     <span className="truncate">{schedule.lugar}</span>
                                   </p>
                                 )}
                               </div>
                               <div className="flex gap-1 flex-shrink-0">
-                                <Button
-                                  size="sm"
-                                  variant="ghost"
-                                  onClick={() => handleEdit(schedule)}
-                                  className="h-8 w-8 p-0"
-                                >
+                                <Button size="sm" variant="ghost" onClick={() => handleEdit(schedule)} className="h-8 w-8 p-0">
                                   <Edit className="h-3 w-3" />
                                 </Button>
-                                <Button
-                                  size="sm"
-                                  variant="ghost"
-                                  onClick={() => handleDelete(schedule.id!)}
-                                  className="text-red-600 hover:text-red-700 h-8 w-8 p-0"
-                                >
+                                <Button size="sm" variant="ghost" onClick={() => handleDelete(schedule.id!)} className="text-red-600 hover:text-red-700 h-8 w-8 p-0">
                                   <Trash2 className="h-3 w-3" />
                                 </Button>
                               </div>
@@ -450,9 +281,7 @@ export default function AdminPage() {
                 </CardContent>
               </Card>
             </div>
-          </div>
           )}
-
           {activeTab === "calendar" && (
             <Card>
               <CardHeader>
